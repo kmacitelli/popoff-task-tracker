@@ -11,8 +11,14 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  //Callibration with hold down button
-  //Once pressed, light on until callibration interval passes
+  //TODO:
+  //Logic - Callibration with hold down button
+  //Logic - Once pressed, light on until callibration interval passes
+  //Electrical - Wire up speaker
+  //Logic - Button press triggers speaker audio of light state
+  //Electrical - wireless transmission from button
+  //Logic - receive wireless transmission from button
+  
 
   uint8_t state = digitalRead(BTN_PIN);
 
