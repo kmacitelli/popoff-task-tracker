@@ -1,4 +1,4 @@
-#define BTN_PIN 6
+/*#define BTN_PIN 6
 #define TRANSMITTER_PIN 4
 
 int prevState = 0;
@@ -27,4 +27,4 @@ void loop() {
   }
 
   delay(200);
-}
+}*/

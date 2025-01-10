@@ -1,4 +1,4 @@
-#define BTN_PIN 6
+/*#define BTN_PIN 6
 #define LIGHT_PIN 4
 #define RESET_INTERVAL_SECONDS 10
 
@@ -33,4 +33,4 @@ void loop() {
     LIGHT_STATE = 0;
   }
   delay(200);
-}
+}*/
