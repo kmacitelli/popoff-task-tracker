@@ -1,7 +1,7 @@
 #define RADIO_RST_PIN 2
 #define RADIO_IRQ_PIN 3
 #define RADIO_CS_PIN 4
-#define LIGHT_PIN
+#define LIGHT_PIN 5
 #define BUZZER_PIN 8
 #define BUTTON_PIN 9
 
@@ -10,7 +10,7 @@
 #define RADIO_SCLK_PIN 13
 
 #define TRANSMITTER_PIN 13
-#define ID_PIN A0
+#define ID_PIN A6
 
 #define COUNTER_0 73
 #define COUNTER_1 244
@@ -23,9 +23,10 @@
 #define COUNTER_8 82
 #define COUNTER_9 176
 
+int sensorValue;
 
 void setup() {
-  pinMode(TRANSMITTER_PIN, OUTPUT_PULLUP);
+  //pinMode(TRANSMITTER_PIN, OUTPUT_PULLUP);
   pinMode(LIGHT_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
@@ -34,18 +35,18 @@ void setup() {
 }
 
 void loop() {
-  uint8_t buttonState = digitalRead(BUTTON_PIN);
+  //uint8_t buttonState = digitalRead(BUTTON_PIN);
   sensorValue = analogRead(ID_PIN);
   Serial.println(readCounterVoltageAsDigit(sensorValue));
 
-  if (buttonState == HIGH){
-    Serial.println("is pressed");
-    buttonPressed();
-  }
-  else{
-    Serial.println("Not pressed");
-  }
-  delay(10);
+  //if (buttonState == HIGH){
+  //  Serial.println("is pressed");
+  //  buttonPressed();
+  //}
+  //else{
+  //  Serial.println("Not pressed");
+  //}
+  delay(100);
 }
 void buttonPressed(){
   //When button is pressed, blink light, beep, and signal
@@ -54,6 +55,7 @@ void buttonPressed(){
   //delay
   //send signal to base
   //turn off light and noise
+  delay(100);
 }
 
 int readCounterVoltageAsDigit(int counterVolt){
@@ -82,4 +84,8 @@ int readCounterVoltageAsDigit(int counterVolt){
   } 
 
   return digitRepresented;
+}
+
+int avg(int num1, int num2){
+  return (num1+num2)/2;
 }
