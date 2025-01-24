@@ -12,16 +12,16 @@
 #define TRANSMITTER_PIN 13
 #define ID_PIN A6
 
-#define COUNTER_0 73
-#define COUNTER_1 244
-#define COUNTER_2 65
-#define COUNTER_3 396
-#define COUNTER_4 58
-#define COUNTER_5 95
-#define COUNTER_6 113
-#define COUNTER_7 137
-#define COUNTER_8 82
-#define COUNTER_9 176
+#define COUNTER_0 388
+#define COUNTER_1 193
+#define COUNTER_2 222
+#define COUNTER_3 310
+#define COUNTER_4 255
+#define COUNTER_5 1023
+#define COUNTER_6 154
+#define COUNTER_7 770
+#define COUNTER_8 171
+#define COUNTER_9 515
 
 int sensorValue;
 
@@ -36,8 +36,8 @@ void setup() {
 
 void loop() {
   //uint8_t buttonState = digitalRead(BUTTON_PIN);
-  sensorValue = analogRead(ID_PIN);
-  Serial.println(readCounterVoltageAsDigit(sensorValue));
+  sensorValue = readCounterVoltageAsDigit(analogRead(ID_PIN));
+  Serial.println(sensorValue);
 
   //if (buttonState == HIGH){
   //  Serial.println("is pressed");
@@ -46,7 +46,7 @@ void loop() {
   //else{
   //  Serial.println("Not pressed");
   //}
-  delay(100);
+  delay(500);
 }
 void buttonPressed(){
   //When button is pressed, blink light, beep, and signal
@@ -61,26 +61,26 @@ void buttonPressed(){
 int readCounterVoltageAsDigit(int counterVolt){
   int digitRepresented;
 
-  if (counterVolt<avg(COUNTER_4, COUNTER_2)){
-    digitRepresented=4;
-  } else if (counterVolt<avg(COUNTER_2, COUNTER_0)){
-    digitRepresented=2;
-  } else if (counterVolt<avg(COUNTER_0, COUNTER_8)){
-    digitRepresented=0;
-  } else if (counterVolt<avg(COUNTER_8, COUNTER_5)){
-    digitRepresented=8;
-  } else if (counterVolt<avg(COUNTER_5, COUNTER_6)){
-    digitRepresented=5;
-  } else if (counterVolt<avg(COUNTER_6, COUNTER_7)){
+  if (counterVolt<avg(COUNTER_6, COUNTER_8)){
     digitRepresented=6;
-  } else if (counterVolt<avg(COUNTER_7, COUNTER_9)){
-    digitRepresented=7;
-  } else if (counterVolt<avg(COUNTER_9, COUNTER_1)){
-    digitRepresented=9;
-  } else if (counterVolt<avg(COUNTER_1, COUNTER_3)){
+  } else if (counterVolt<avg(COUNTER_8, COUNTER_1)){
+    digitRepresented=8;
+  } else if (counterVolt<avg(COUNTER_1, COUNTER_2)){
     digitRepresented=1;
-  } else {
+  } else if (counterVolt<avg(COUNTER_2, COUNTER_4)){
+    digitRepresented=2;
+  } else if (counterVolt<avg(COUNTER_4, COUNTER_3)){
+    digitRepresented=4;
+  } else if (counterVolt<avg(COUNTER_3, COUNTER_0)){
     digitRepresented=3;
+  } else if (counterVolt<avg(COUNTER_0, COUNTER_9)){
+    digitRepresented=0;
+  } else if (counterVolt<avg(COUNTER_9, COUNTER_7)){
+    digitRepresented=9;
+  } else if (counterVolt<avg(COUNTER_7, COUNTER_5)){
+    digitRepresented=7;
+  } else {
+    digitRepresented=5;
   } 
 
   return digitRepresented;
