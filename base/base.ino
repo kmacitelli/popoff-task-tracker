@@ -1,35 +1,42 @@
-#define RADIO_RST_PIN 2
-#define RADIO_IRQ_PIN 3
-#define RADIO_CS_PIN 4
+//IO Pins
 #define LIGHT_PIN_1 5
 #define LIGHT_PIN_2 6
 #define LIGHT_PIN_3 7
 #define BUZZER_PIN 8
 #define BUTTON_PIN 9
 
+//Radio Pins
+#define RADIO_RST_PIN 2
+#define RADIO_IRQ_PIN 3
+#define RADIO_CS_PIN 4
 #define RADIO_MOSI_PIN 11
 #define RADIO_MISO_PIN 12
 #define RADIO_SCLK_PIN 13
-
-#define RESET_INTERVAL_SECONDS 10
 #define RECEIVER_PIN 13
-#define ID_PIN A0
 
+//Thresholds for analog input for counter numbers
 #define COUNTER_0 73
 #define COUNTER_1 244
 #define COUNTER_2 65
 #define COUNTER_3 396
-#define COUNTER_4 58
+#define COUNTER_4 60
 #define COUNTER_5 95
 #define COUNTER_6 113
 #define COUNTER_7 137
 #define COUNTER_8 82
 #define COUNTER_9 176
 
+//Reset interval set to 10 for testing/demo, set to 86400 for daily
+#define RESET_INTERVAL_SECONDS 10
+
+//Unique ID of the module for use pairing to remote
+#define ID_PIN A0
+
 int LIGHT_STATE;
 unsigned long previousMillis = 0;
 unsigned long interval = (1000 * RESET_INTERVAL_SECONDS);
 int sensorValue = 0;
+int counterUID;
 
 void setup() {
   pinMode(RECEIVER_PIN, INPUT_PULLUP);
@@ -40,19 +47,28 @@ void setup() {
   pinMode(BUZZER_PIN, OUTPUT);
   Serial.begin(9600);
   LIGHT_STATE=0;
+
+  counterUID = readCounterVoltageAsDigit(analogRead(ID_PIN));
 }
 
 void loop() {
-  //TODO: Callibration button, light on until callibration interval passes
   uint8_t completionState = digitalRead(RECEIVER_PIN);
   uint8_t buttonState = digitalRead(BUTTON_PIN);
-  sensorValue = analogRead(ID_PIN);
 
+  //Serial.println(counterUID);
 
-  Serial.println(readCounterVoltageAsDigit(sensorValue));
+  //TODO: Callibration button, light on until callibration interval passes
+  //Check if button held down
+  if (buttonState == HIGH){
+    Serial.println("is pressed");
+  }
+  else{
+    Serial.println("Not pressed");
+  }
 
-  //When button is pressed, light state 1, turn on light
-  if (completionState == LOW)
+  //When we get signal button is pressed, light state 1, turn on light
+  //todo: receive radio signal
+  if ((completionState == LOW) && (radioId == counterUID))
   {
     //Serial.println("Activated!");
     turnOnLights();
@@ -67,13 +83,7 @@ void loop() {
     LIGHT_STATE = 0;
   }
 
-  //Check if button pressed
-  if (buttonState == HIGH){
-    Serial.println("is pressed");
-  }
-  else{
-    Serial.println("Not pressed");
-  }
+
   delay(200);
 }
 
