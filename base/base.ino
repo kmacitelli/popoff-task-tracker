@@ -6,7 +6,7 @@
 //Reset interval set to 10 for testing/demo, set to 86400 for daily
 #define RESET_INTERVAL_SECONDS 10
 //Enable requirement of matching of remote ID to base ID
-#define REQUIRE_UID_MATCH true
+#define REQUIRE_UID_MATCH false
 
 //IO Pins
 #define LIGHT_PIN_1 5
@@ -46,6 +46,7 @@ unsigned long interval = (1000 * RESET_INTERVAL_SECONDS);
 int sensorValue = 0;
 int baseUID;
 int remoteUID;
+uint8_t completionState = false;
 
 // Singleton instance of the radio driver
 RH_RF69 rf69(RFM69_CS, RFM69_INT);
@@ -64,7 +65,6 @@ void setup() {
 }
 
 void loop() {
-  uint8_t completionState = true;
   //digitalRead(RECEIVER_PIN);
   uint8_t buttonState = digitalRead(BUTTON_PIN);
 
@@ -84,15 +84,6 @@ void loop() {
   if (rf69.available()){
     Serial.println("got a message!");
     receiveTransmission();
-  }
-  if (completionState == LOW)
-  {
-    //Flag to easily control if module requires matching ID in signal or be more permissive
-    if ((!REQUIRE_UID_MATCH) || (REQUIRE_UID_MATCH && (remoteUID == baseUID))){
-      turnOnLights();
-      LIGHT_STATE = 1;
-      Serial.println("Received signal with ID " + String(remoteUID));
-    }
   }
 
   //if timer > reset interval, light state 0, turn off light, reset timer
@@ -154,6 +145,16 @@ void receiveTransmission(){
       }
   } else {
     Serial.println("Receive failed");
+  }
+
+  if (LIGHT_STATE == 0)
+  {
+    //Flag to easily control if module requires matching ID in signal or be more permissive
+    if ((!REQUIRE_UID_MATCH) || (REQUIRE_UID_MATCH && (remoteUID == baseUID))){
+      turnOnLights();
+      LIGHT_STATE = 1;
+      Serial.println("Received signal with ID " + String(remoteUID));
+    }
   }
 }
 
