@@ -1,3 +1,7 @@
+//RadioHead radio libraries
+#include <SPI.h>
+#include <RH_RF69.h>
+
 //Remote IO
 #define LIGHT_PIN 5
 #define BUZZER_PIN 3
@@ -5,13 +9,14 @@
 #define ID_PIN A6
 
 //Remote radio stuff
-#define RADIO_RST_PIN 2
-#define RADIO_IRQ_PIN 3
-#define RADIO_CS_PIN 4
-#define RADIO_MOSI_PIN 11
-#define RADIO_MISO_PIN 12
-#define RADIO_SCLK_PIN 13
-#define TRANSMITTER_PIN 13
+#define RF69_FREQ 433.0
+#define RFM69_CS    6
+#define RFM69_INT   7
+#define RFM69_RST   11
+//#define RADIO_MOSI_PIN 8
+//#define RADIO_MISO_PIN 10
+//#define RADIO_SCLK_PIN 9
+//#define TRANSMITTER_PIN 13
 
 //Thresholds for analog input for counter numbers
 #define COUNTER_0 388
@@ -21,20 +26,24 @@
 #define COUNTER_4 255
 #define COUNTER_5 1023
 #define COUNTER_6 154
-#define COUNTER_7 770
+#define COUNTER_7 770  
 #define COUNTER_8 171
 #define COUNTER_9 515
 
 //Unique ID of the module for use pairing to base
 int counterUID;
+// Singleton instance of the radio driver
+RH_RF69 rf69(RFM69_CS, RFM69_INT);
+int16_t packetnum = 0;  // packet counter, we increment per xmission
 
 void setup() {
-  //pinMode(TRANSMITTER_PIN, OUTPUT_PULLUP);
   pinMode(LIGHT_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
 
   Serial.begin(9600);
+
+  initRadio();
 
   counterUID = readCounterVoltageAsDigit(analogRead(ID_PIN));
 }
@@ -51,6 +60,32 @@ void loop() {
   }
   delay(100);
 }
+
+void initRadio(){
+  while (!Serial) delay(1); 
+  pinMode(RFM69_RST, OUTPUT);
+  digitalWrite(RFM69_RST, LOW);
+
+  Serial.println("RFM69 TX Test!");
+
+  // manual reset
+  digitalWrite(RFM69_RST, HIGH);
+  delay(10);
+  digitalWrite(RFM69_RST, LOW);
+  delay(10);
+
+  if (!rf69.init()) {
+    Serial.println("RFM69 radio init failed");
+    while (1);
+  }
+  Serial.println("RFM69 radio init OK!");
+  if (!rf69.setFrequency(RF69_FREQ)) {
+    Serial.println("setFrequency failed");
+  }
+  rf69.setTxPower(20, true);  // range from 14-20 for power, 2nd arg must be true for 69HCW
+  Serial.print("RFM69 radio @");  Serial.print((int)RF69_FREQ);  Serial.println(" MHz");
+}
+
 void buttonPressed(){
   //if button is pressed, we need to send signal to base, beep, and light up
   digitalWrite(LIGHT_PIN, HIGH);
@@ -66,7 +101,13 @@ void buttonPressed(){
 
 //use our radio module to send a signal to base including our UID
 void sendButtonSignal(){
-  //todo radio here
+  char radiopacket[20] = "Hello World #";
+  itoa(packetnum++, radiopacket+13, 10);
+  Serial.print("Sending "); Serial.println(radiopacket);
+
+  // Send a message!
+  rf69.send((uint8_t *)radiopacket, strlen(radiopacket));
+  rf69.waitPacketSent();
 }
 
 //Given analog input from counter, determine digit based on the reading
