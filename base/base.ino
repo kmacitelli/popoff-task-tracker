@@ -15,14 +15,14 @@
 #define LIGHT_PIN_3 7
 #define LIGHT_PIN_4 8
 #define LIGHT_PIN_5 9
-#define BUZZER_PIN 1
-#define BUTTON_PIN 0
+#define BUZZER_PIN A1
+#define BUTTON_PIN 10
 
 //Radio Pins
 #define RF69_FREQ 433.0
-#define RFM69_CS    4
-#define RFM69_INT   3
-#define RFM69_RST   2
+#define RFM69_CS    4 //CS
+#define RFM69_INT   3 //G0
+#define RFM69_RST   2 //RST
 //#define RADIO_MOSI_PIN 11
 //#define RADIO_MISO_PIN 12
 //#define RADIO_SCLK_PIN 13
@@ -67,13 +67,16 @@ void setup() {
   pinMode(LIGHT_PIN_3, OUTPUT);
   pinMode(LIGHT_PIN_4, OUTPUT);
   pinMode(LIGHT_PIN_5, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
-  initializeRadio();
+
 
   LIGHT_STATE=0;
   baseUID = readCounterVoltageAsDigit(analogRead(ID_PIN));
   Serial.begin(9600);
+
+  initializeRadio();
+
 }
 
 void loop() {
@@ -81,27 +84,33 @@ void loop() {
   //BASE BUTTON
   uint8_t buttonState = digitalRead(BUTTON_PIN);
   //Short button press will trigger audio state readout, long press will callibrate
-  if (buttonState == HIGH){
-    //Serial.println("is pressed");
-    buttonPressed == true;
+
+  Serial.println("buttonState: " + String(buttonState));
+  Serial.println("consecPresses: " + String(consecButtonPress));
+  Serial.println("buttonPressed:" + String(buttonPressed));
+  Serial.println("");
+  if (buttonState == LOW){
+    Serial.println("is pressed");
+    buttonPressed = true;
     consecButtonPress++;
   } 
   //triggered when button stops being pressed
   else if (buttonPressed == true){
-    //Serial.println("Press ended");
+    Serial.println("Press ended");
     if (consecButtonPress > HELD_PRESSES_THRESHOLD){
       calibrate();
     }
     else{
       readout();
     }
-    buttonPressed == false;
+    buttonPressed = false;
     consecButtonPress = 0;
   }
 
   //RADIO 
   //Check if we have a transmission available
   if (rf69.available() && LIGHT_STATE==0){
+    Serial.println("attempting receive");
     String remoteUID = receiveTransmission();
     //Flag to easily control if module requires matching ID in signal or be more permissive
     if ((!REQUIRE_UID_MATCH) || (REQUIRE_UID_MATCH && (remoteUID == baseUID))){
@@ -116,12 +125,17 @@ void loop() {
   if (millis() - previousMillis > interval){
     reset();
   }
-  delay(100);
+  delay(200);
 }
 
 //TODO callibratee logic
 void calibrate(){
   Serial.println("Calibrating");
+
+  //demo link button hold to lights
+  turnOnLights();
+  delay(10000);
+  turnOffLights();
 }
 
 //Communicate completion state of task with beeps

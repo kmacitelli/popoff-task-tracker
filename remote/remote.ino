@@ -38,7 +38,7 @@ int16_t packetnum = 0;  // packet counter, we increment per xmission
 
 void setup() {
   pinMode(LIGHT_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
 
   Serial.begin(9600);
@@ -52,13 +52,13 @@ void loop() {
   //Read from button
   uint8_t buttonState = digitalRead(BUTTON_PIN);
   if (buttonState == HIGH){
-    //Serial.println("not pressed");
+    Serial.println("not pressed");
   }
   else{
-    //Serial.println("is pressed");
+    Serial.println("is pressed");
     buttonPressed();
   }
-  delay(100);
+  delay(200);
 }
 
 void initRadio(){
