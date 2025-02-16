@@ -5,7 +5,7 @@
 
 //Demo flags 
 //Reset interval set to 10 for testing/demo, set to 86400 for daily
-#define RESET_INTERVAL_SECONDS 10
+#define RESET_INTERVAL_SECONDS 30
 //Enable requirement of matching of remote ID to base ID
 #define REQUIRE_UID_MATCH false
 
@@ -126,14 +126,38 @@ void loop() {
   delay(200);
 }
 
-//TODO callibratee logic
+//Callibration logic
 void calibrate(){
+  //set reset time to half the reset interval from now
   Serial.println("Calibrating");
+  previousMillis = millis() - RESET_INTERVAL_SECONDS/2.0*1000;
 
-  //demo link button hold to lights
-  turnOnLights();
-  delay(10000);
+  //Flash lights and beep 3x
+  //Keep light on or off afterwards
+  if (LIGHT_STATE == 0){
+    turnOnLights();
+  }
+  digitalWrite(BUZZER_PIN, HIGH);
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
   turnOffLights();
+  delay(200);
+  digitalWrite(BUZZER_PIN, HIGH);
+  turnOnLights();
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
+  turnOffLights();
+  delay(200);
+  digitalWrite(BUZZER_PIN, HIGH);
+  turnOnLights();
+  delay(100);
+  digitalWrite(BUZZER_PIN, LOW);
+  turnOffLights();
+  if (LIGHT_STATE == 1){
+    turnOnLights();
+  }
+
+  
 }
 
 //Communicate completion state of task with beeps
