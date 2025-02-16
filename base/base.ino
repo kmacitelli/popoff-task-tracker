@@ -139,11 +139,19 @@ void calibrate(){
 //Communicate completion state of task with beeps
 void readout(){
   if (LIGHT_STATE == 0){
-    //TODO beep once
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(100);
+    digitalWrite(BUZZER_PIN, LOW);
     Serial.println("state is 0");
   }
   if (LIGHT_STATE == 1){
-    //TODO beep twice
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(100);
+    digitalWrite(BUZZER_PIN, LOW);
+    delay(300);
+    digitalWrite(BUZZER_PIN, HIGH);
+    delay(100);
+    digitalWrite(BUZZER_PIN, LOW);
     Serial.println("state is 1");
   }
 }
