@@ -52,10 +52,10 @@ void loop() {
   //Read from button
   uint8_t buttonState = digitalRead(BUTTON_PIN);
   if (buttonState == HIGH){
-    Serial.println("not pressed");
+    //Serial.println("not pressed");
   }
   else{
-    Serial.println("is pressed");
+    //Serial.println("is pressed");
     buttonPressed();
   }
   delay(200);
@@ -93,7 +93,7 @@ void buttonPressed(){
   sendButtonSignal();
 
   //Noise for shorter time than light
-  delay(200);
+  delay(400);
   digitalWrite(BUZZER_PIN, LOW);
   delay(1400);
   digitalWrite(LIGHT_PIN, LOW);

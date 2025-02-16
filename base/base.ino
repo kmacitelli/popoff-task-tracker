@@ -61,6 +61,7 @@ String remoteIdRec;
 RH_RF69 rf69(RFM69_CS, RFM69_INT);
 
 void setup() {
+  Serial.begin(9600);
   //Initialize IO
   pinMode(LIGHT_PIN_1, OUTPUT);
   pinMode(LIGHT_PIN_2, OUTPUT);
@@ -73,7 +74,7 @@ void setup() {
 
   LIGHT_STATE=0;
   baseUID = readCounterVoltageAsDigit(analogRead(ID_PIN));
-  Serial.begin(9600);
+
 
   initializeRadio();
 
@@ -85,10 +86,6 @@ void loop() {
   uint8_t buttonState = digitalRead(BUTTON_PIN);
   //Short button press will trigger audio state readout, long press will callibrate
 
-  Serial.println("buttonState: " + String(buttonState));
-  Serial.println("consecPresses: " + String(consecButtonPress));
-  Serial.println("buttonPressed:" + String(buttonPressed));
-  Serial.println("");
   if (buttonState == LOW){
     Serial.println("is pressed");
     buttonPressed = true;
@@ -107,9 +104,10 @@ void loop() {
     consecButtonPress = 0;
   }
 
+  //Serial.println("LIGHT_STATE is " + String(LIGHT_STATE));
   //RADIO 
   //Check if we have a transmission available
-  if (rf69.available() && LIGHT_STATE==0){
+  if (rf69.available()){// && LIGHT_STATE==0){
     Serial.println("attempting receive");
     String remoteUID = receiveTransmission();
     //Flag to easily control if module requires matching ID in signal or be more permissive
@@ -149,7 +147,7 @@ void readout(){
     Serial.println("state is 1");
   }
 }
-
+   
 //Turn off light, reset time elapsed
 void reset(){
     //Serial.println("Resetting!");
@@ -165,6 +163,12 @@ void initializeRadio(){
 
   pinMode(RFM69_RST, OUTPUT);
   digitalWrite(RFM69_RST, LOW);  
+
+  // manual reset
+  digitalWrite(RFM69_RST, HIGH);
+  delay(10);
+  digitalWrite(RFM69_RST, LOW);
+  delay(10);
 
   if (!rf69.init()){
     Serial.println("RFM69 radio init failed");
