@@ -34,16 +34,6 @@ int dipSwitchVals[ID_SIZE] = {0, 21, 47, 68, 98, 117, 138, 156, 191, 207, 225, 2
                         341, 352, 365, 375, 389, 398, 408, 417, 435, 442, 451, 458, 469, 476, 484, 490,
                         512, 518, 525, 530, 538, 543, 549, 554, 565, 570, 575, 579, 586, 590, 595, 599,
                         615, 619, 623, 626, 632, 635, 639, 642, 649, 653, 656, 659, 664, 666, 670, 672};
-#define COUNTER_0 73
-#define COUNTER_1 244
-#define COUNTER_2 65
-#define COUNTER_3 396
-#define COUNTER_4 60
-#define COUNTER_5 95
-#define COUNTER_6 113
-#define COUNTER_7 137
-#define COUNTER_8 82
-#define COUNTER_9 176
 
 //Unique ID of the module for use pairing to remote
 #define ID_PIN A0

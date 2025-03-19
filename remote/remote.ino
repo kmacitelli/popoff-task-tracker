@@ -33,16 +33,11 @@
 #define RADIO_SCLK_PIN 9
 
 //Thresholds for analog input for counter numbers
-#define COUNTER_0 388
-#define COUNTER_1 193
-#define COUNTER_2 222
-#define COUNTER_3 310
-#define COUNTER_4 255
-#define COUNTER_5 1023
-#define COUNTER_6 154
-#define COUNTER_7 770  
-#define COUNTER_8 171
-#define COUNTER_9 515
+#define ID_SIZE 64
+int dipSwitchVals[ID_SIZE] = {0, 21, 47, 68, 98, 117, 138, 156, 191, 207, 225, 239, 260, 272, 287, 299,
+                        341, 352, 365, 375, 389, 398, 408, 417, 435, 442, 451, 458, 469, 476, 484, 490,
+                        512, 518, 525, 530, 538, 543, 549, 554, 565, 570, 575, 579, 586, 590, 595, 599,
+                        615, 619, 623, 626, 632, 635, 639, 642, 649, 653, 656, 659, 664, 666, 670, 672};
 
 //Unique ID of the module for use pairing to base
 int counterUID;
@@ -128,27 +123,23 @@ void sendButtonSignal(){
 int readCounterVoltageAsDigit(int counterVolt){
   int digitRepresented;
 
-  if (counterVolt<avg(COUNTER_6, COUNTER_8)){
-    digitRepresented=6;
-  } else if (counterVolt<avg(COUNTER_8, COUNTER_1)){
-    digitRepresented=8;
-  } else if (counterVolt<avg(COUNTER_1, COUNTER_2)){
-    digitRepresented=1;
-  } else if (counterVolt<avg(COUNTER_2, COUNTER_4)){
-    digitRepresented=2;
-  } else if (counterVolt<avg(COUNTER_4, COUNTER_3)){
-    digitRepresented=4;
-  } else if (counterVolt<avg(COUNTER_3, COUNTER_0)){
-    digitRepresented=3;
-  } else if (counterVolt<avg(COUNTER_0, COUNTER_9)){
-    digitRepresented=0;
-  } else if (counterVolt<avg(COUNTER_9, COUNTER_7)){
-    digitRepresented=9;
-  } else if (counterVolt<avg(COUNTER_7, COUNTER_5)){
-    digitRepresented=7;
-  } else {
-    digitRepresented=5;
-  } 
+  boolean foundRange = false;
+  int arrIndex = 0;
+
+  while ((!foundRange) && (arrIndex < ID_SIZE-1)){
+    //find avg current index num and next num, commpare to that
+    int compareNum = avg(dipSwitchVals[arrIndex], dipSwitchVals[arrIndex+1]);
+
+    if (counterVolt < compareNum){
+      digitRepresented = arrIndex;
+      foundRange = true;
+    }
+    arrIndex++;
+  }
+
+  if (!foundRange){
+    digitRepresented = 63;
+  }
 
   return digitRepresented;
 }
