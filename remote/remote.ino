@@ -2,21 +2,35 @@
 #include <SPI.h>
 #include <RH_RF69.h>
 
-//Remote IO
-#define LIGHT_PIN 5
-#define BUZZER_PIN 3
-#define BUTTON_PIN 1
+//Remote IO Nano
+// #define LIGHT_PIN 7
+// #define BUZZER_PIN 6
+// #define BUTTON_PIN 5
+// #define ID_PIN A1
+
+//Remote IO MKR
+#define BUTTON_PIN 5
+#define LIGHT_PIN 3
+#define BUZZER_PIN    1
 #define ID_PIN A6
 
-//Remote radio stuff
+//Remote radio stuff 
 #define RF69_FREQ 433.0
+//Ardunio Nano
+// #define RFM69_CS    10
+// #define RFM69_INT   2
+// #define RFM69_RST   9
+// #define RADIO_MOSI_PIN 11
+// #define RADIO_MISO_PIN 12
+// #define RADIO_SCLK_PIN 13
+
+//Ardunio mkr
 #define RFM69_CS    6
 #define RFM69_INT   7
 #define RFM69_RST   11
-//#define RADIO_MOSI_PIN 8
-//#define RADIO_MISO_PIN 10
-//#define RADIO_SCLK_PIN 9
-//#define TRANSMITTER_PIN 13
+#define RADIO_MOSI_PIN 8
+#define RADIO_MISO_PIN 10
+#define RADIO_SCLK_PIN 9
 
 //Thresholds for analog input for counter numbers
 #define COUNTER_0 388
@@ -52,10 +66,10 @@ void loop() {
   //Read from button
   uint8_t buttonState = digitalRead(BUTTON_PIN);
   if (buttonState == HIGH){
-    //Serial.println("not pressed");
+    Serial.println("not pressed");
   }
   else{
-    //Serial.println("is pressed");
+    Serial.println("is pressed");
     buttonPressed();
   }
   delay(200);
@@ -93,7 +107,7 @@ void buttonPressed(){
   sendButtonSignal();
 
   //Noise for shorter time than light
-  delay(400);
+  delay(100);
   digitalWrite(BUZZER_PIN, LOW);
   delay(1400);
   digitalWrite(LIGHT_PIN, LOW);

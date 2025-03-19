@@ -5,7 +5,7 @@
 
 //Demo flags 
 //Reset interval set to 10 for testing/demo, set to 86400 for daily
-#define RESET_INTERVAL_SECONDS 30
+#define RESET_INTERVAL_SECONDS 10
 //Enable requirement of matching of remote ID to base ID
 #define REQUIRE_UID_MATCH false
 
@@ -29,6 +29,11 @@
 //#define RECEIVER_PIN 13
 
 //Thresholds for analog input for counter numbers
+#define ID_SIZE 64
+int dipSwitchVals[ID_SIZE] = {0, 21, 47, 68, 98, 117, 138, 156, 191, 207, 225, 239, 260, 272, 287, 299,
+                        341, 352, 365, 375, 389, 398, 408, 417, 435, 442, 451, 458, 469, 476, 484, 490,
+                        512, 518, 525, 530, 538, 543, 549, 554, 565, 570, 575, 579, 586, 590, 595, 599,
+                        615, 619, 623, 626, 632, 635, 639, 642, 649, 653, 656, 659, 664, 666, 670, 672};
 #define COUNTER_0 73
 #define COUNTER_1 244
 #define COUNTER_2 65
@@ -72,16 +77,16 @@ void setup() {
   pinMode(BUZZER_PIN, OUTPUT);
 
 
+
   LIGHT_STATE=0;
   baseUID = readCounterVoltageAsDigit(analogRead(ID_PIN));
-
+  //Serial.println("Input: " + String(readCounterVoltageAsDigit(analogRead(ID_PIN))));
 
   initializeRadio();
 
 }
 
 void loop() {
-
   //BASE BUTTON
   uint8_t buttonState = digitalRead(BUTTON_PIN);
   //Short button press will trigger audio state readout, long press will callibrate
@@ -258,27 +263,23 @@ int avg(int num1, int num2){
 int readCounterVoltageAsDigit(int counterVolt){
   int digitRepresented;
 
-  if (counterVolt<avg(COUNTER_4, COUNTER_2)){
-    digitRepresented=4;
-  } else if (counterVolt<avg(COUNTER_2, COUNTER_0)){
-    digitRepresented=2;
-  } else if (counterVolt<avg(COUNTER_0, COUNTER_8)){
-    digitRepresented=0;
-  } else if (counterVolt<avg(COUNTER_8, COUNTER_5)){
-    digitRepresented=8;
-  } else if (counterVolt<avg(COUNTER_5, COUNTER_6)){
-    digitRepresented=5;
-  } else if (counterVolt<avg(COUNTER_6, COUNTER_7)){
-    digitRepresented=6;
-  } else if (counterVolt<avg(COUNTER_7, COUNTER_9)){
-    digitRepresented=7;
-  } else if (counterVolt<avg(COUNTER_9, COUNTER_1)){
-    digitRepresented=9;
-  } else if (counterVolt<avg(COUNTER_1, COUNTER_3)){
-    digitRepresented=1;
-  } else {
-    digitRepresented=3;
-  } 
+  boolean foundRange = false;
+  int arrIndex = 0;
+
+  while ((!foundRange) && (arrIndex < ID_SIZE-1)){
+    //find avg current index num and next num, commpare to that
+    int compareNum = avg(dipSwitchVals[arrIndex], dipSwitchVals[arrIndex+1]);
+
+    if (counterVolt < compareNum){
+      digitRepresented = arrIndex;
+      foundRange = true;
+    }
+    arrIndex++;
+  }
+
+  if (!foundRange){
+    digitRepresented = 63;
+  }
 
   return digitRepresented;
 }
