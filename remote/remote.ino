@@ -10,9 +10,9 @@
 
 //Remote IO MKR
 #define BUTTON_PIN 5
-#define LIGHT_PIN 3
-#define BUZZER_PIN    1
-#define ID_PIN A6
+#define LIGHT_PIN 0
+#define BUZZER_PIN A1
+#define ID_PIN A4
 
 //Remote radio stuff 
 #define RF69_FREQ 433.0
@@ -55,6 +55,7 @@ void setup() {
   initRadio();
 
   counterUID = readCounterVoltageAsDigit(analogRead(ID_PIN));
+  Serial.println("DIP Switch is: " + String(counterUID));
 }
 
 void loop() {
@@ -68,6 +69,9 @@ void loop() {
     buttonPressed();
   }
   delay(200);
+
+    counterUID = readCounterVoltageAsDigit(analogRead(ID_PIN));
+  Serial.println("DIP Switch is: " + String(counterUID));
 }
 
 void initRadio(){
@@ -98,13 +102,12 @@ void initRadio(){
 void buttonPressed(){
   //if button is pressed, we need to send signal to base, beep, and light up
   digitalWrite(LIGHT_PIN, HIGH);
-  digitalWrite(BUZZER_PIN, HIGH);
+  //analogWrite(BUZZER_PIN, 250);
+  tone(BUZZER_PIN, 500, 200);
   sendButtonSignal();
 
-  //Noise for shorter time than light
-  delay(100);
-  digitalWrite(BUZZER_PIN, LOW);
-  delay(1400);
+  //Noise for shorter time than li ght
+  delay(1600);
   digitalWrite(LIGHT_PIN, LOW);
 }
 
