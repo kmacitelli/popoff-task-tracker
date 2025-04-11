@@ -28,6 +28,8 @@
 //#define RADIO_SCLK_PIN 13
 //#define RECEIVER_PIN 13
 
+#define BUZZER_FREQ 600
+
 //Thresholds for analog input for counter numbers
 #define ID_SIZE 64
 int dipSwitchVals[ID_SIZE] = {0, 21, 47, 68, 98, 117, 138, 156, 191, 207, 225, 239, 260, 272, 287, 299,
@@ -64,9 +66,6 @@ void setup() {
   pinMode(LIGHT_PIN_4, OUTPUT);
   pinMode(LIGHT_PIN_5, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-  pinMode(BUZZER_PIN, OUTPUT);
-
-
 
   LIGHT_STATE=0;
   baseUID = readCounterVoltageAsDigit(analogRead(ID_PIN));
@@ -132,45 +131,40 @@ void calibrate(){
   if (LIGHT_STATE == 0){
     turnOnLights();
   }
-  digitalWrite(BUZZER_PIN, HIGH);
+  tone(BUZZER_PIN, BUZZER_FREQ, 100);
   delay(100);
-  digitalWrite(BUZZER_PIN, LOW);
   turnOffLights();
+
   delay(200);
-  digitalWrite(BUZZER_PIN, HIGH);
+
+  turnOnLights();
+  tone(BUZZER_PIN, BUZZER_FREQ, 100);
+  delay(100);
+  turnOffLights();
+
+  delay(200);
+
+  tone(BUZZER_PIN, BUZZER_FREQ, 100);
   turnOnLights();
   delay(100);
-  digitalWrite(BUZZER_PIN, LOW);
   turnOffLights();
-  delay(200);
-  digitalWrite(BUZZER_PIN, HIGH);
-  turnOnLights();
-  delay(100);
-  digitalWrite(BUZZER_PIN, LOW);
-  turnOffLights();
+
   if (LIGHT_STATE == 1){
     turnOnLights();
   }
-
   
 }
 
 //Communicate completion state of task with beeps
 void readout(){
-  if (LIGHT_STATE == 0){
-    digitalWrite(BUZZER_PIN, HIGH);
-    delay(100);
-    digitalWrite(BUZZER_PIN, LOW);
+  if (!LIGHT_STATE){
+    tone(BUZZER_PIN, BUZZER_FREQ, 200);
     Serial.println("state is 0");
   }
-  if (LIGHT_STATE == 1){
-    digitalWrite(BUZZER_PIN, HIGH);
-    delay(100);
-    digitalWrite(BUZZER_PIN, LOW);
+  if (LIGHT_STATE){
+    tone(BUZZER_PIN, BUZZER_FREQ, 200);
     delay(300);
-    digitalWrite(BUZZER_PIN, HIGH);
-    delay(100);
-    digitalWrite(BUZZER_PIN, LOW);
+    tone(BUZZER_PIN, BUZZER_FREQ, 200);
     Serial.println("state is 1");
   }
 }
